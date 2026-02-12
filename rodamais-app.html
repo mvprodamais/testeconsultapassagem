@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rodamais - Consulta de Passagens</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px;
+      padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+      padding: 24px 0 16px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2563eb;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* Search Section */
+    .search-section {
+      margin-top: 40px;
+    }
+
+    .search-label {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 20px 24px;
+      font-size: 20px;
+      border: 3px solid #e5e7eb;
+      border-radius: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      background: #fafafa;
+    }
+
+    .search-input:focus {
+      border-color: #2563eb;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-input::placeholder {
+      color: #9ca3af;
+      font-weight: 400;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #e5e7eb;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover {
+      background: #d1d5db;
+    }
+
+    .clear-btn.visible {
+      display: flex;
+    }
+
+    /* Results */
+    .results-container {
+      margin-top: 24px;
+    }
+
+    .result-card {
+      background: #fafafa;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .result-card:hover {
+      border-color: #2563eb;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+
+    .result-card:active {
+      transform: scale(0.98);
+    }
+
+    .destination-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .company-name {
+      font-size: 16px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .no-results-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .no-results-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .no-results-text {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .ask-attendant-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ask-attendant-btn:hover {
+      background: #1d4ed8;
+    }
+
+    /* Success Screen */
+    .success-screen {
+      display: none;
+      padding-top: 40px;
+    }
+
+    .success-screen.active {
+      display: block;
+    }
+
+    .success-icon {
+      text-align: center;
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: scaleIn 0.4s ease;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    .success-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #10b981;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .success-destination {
+      font-size: 36px;
+      font-weight: 800;
+      color: #1a1a1a;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .success-company {
+      font-size: 20px;
+      color: #6b7280;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .next-step-card {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-radius: 20px;
+      padding: 32px 24px;
+      margin-top: 40px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+    }
+
+    .next-step-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .ticket-icon {
+      text-align: center;
+      font-size: 64px;
+      margin: 20px 0;
+    }
+
+    .next-step-text {
+      font-size: 18px;
+      color: #ffffff;
+      line-height: 1.6;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .back-btn {
+      background: #ffffff;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 32px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #f0f7ff;
+    }
+
+    /* Footer Banner */
+    .footer-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #10b981;
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .footer-icon {
+      margin-right: 8px;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .search-label {
+        font-size: 20px;
+      }
+
+      .search-input {
+        font-size: 18px;
+        padding: 18px 20px;
+      }
+
+      .destination-name {
+        font-size: 20px;
+      }
+
+      .success-destination {
+        font-size: 28px;
+      }
+
+      .success-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // Fuzzy search function
+    function fuzzySearch(text, query) {
+      const textLower = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const queryLower = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      
+      if (textLower.includes(queryLower)) return true;
+      
+      let queryIndex = 0;
+      for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
+        if (textLower[i] === queryLower[queryIndex]) {
+          queryIndex++;
+        }
+      }
+      return queryIndex === queryLower.length;
+    }
+
+    function App() {
+      const [routes, setRoutes] = useState([]);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedDestination, setSelectedDestination] = useState(null);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        // Load routes data
+        fetch('routes_data.json')
+          .then(res => res.json())
+          .then(data => {
+            setRoutes(data);
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error('Erro ao carregar dados:', err);
+            setLoading(false);
+          });
+      }, []);
+
+      // Filter and search results
+      const searchResults = useMemo(() => {
+        if (!searchQuery.trim() || searchQuery.length < 2) return [];
+
+        const results = routes.filter(route => 
+          fuzzySearch(route.destino, searchQuery)
+        );
+
+        // Group by destination and get unique destinations with their companies
+        const destinationMap = new Map();
+        results.forEach(route => {
+          if (!destinationMap.has(route.destino)) {
+            destinationMap.set(route.destino, {
+              destino: route.destino,
+              empresas: new Set()
+            });
+          }
+          destinationMap.get(route.destino).empresas.add(route.empresa);
+        });
+
+        return Array.from(destinationMap.values())
+          .map(item => ({
+            destino: item.destino,
+            empresas: Array.from(item.empresas)
+          }))
+          .slice(0, 20); // Limit to 20 results for performance
+      }, [searchQuery, routes]);
+
+      const handleDestinationClick = (destination) => {
+        setSelectedDestination(destination);
+      };
+
+      const handleBack = () => {
+        setSelectedDestination(null);
+        setSearchQuery('');
+      };
+
+      const handleClearSearch = () => {
+        setSearchQuery('');
+      };
+
+      if (loading) {
+        return (
+          <div className="container">
+            <div className="header">
+              <div className="logo">Rodamais</div>
+              <div className="tagline">Consulta Rápida de Passagens</div>
+            </div>
+            <div className="loading">
+              <div className="loading-spinner"></div>
+              <div>Carregando destinos...</div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <>
+          <div className="container">
+            {!selectedDestination ? (
+              <>
+                <div className="header">
+                  <div className="logo">Rodamais</div>
+                  <div className="tagline">Consulta Rápida de Passagens</div>
+                </div>
+
+                <div className="search-section">
+                  <div className="search-label">
+                    Para onde você quer viajar?
+                  </div>
+
+                  <div className="search-input-wrapper">
+                    <input
+                      type="text"
+                      className="search-input"
+                      placeholder="Digite a cidade..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                    />
+                    <button 
+                      className={`clear-btn ${searchQuery ? 'visible' : ''}`}
+                      onClick={handleClearSearch}
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  {searchQuery.length >= 2 && (
+                    <div className="results-container">
+                      {searchResults.length > 0 ? (
+                        searchResults.map((result, index) => (
+                          <div 
+                            key={index} 
+                            className="result-card"
+                            onClick={() => handleDestinationClick(result)}
+                          >
+                            <div className="destination-name">{result.destino}</div>
+                            <div className="company-name">
+                              {result.empresas.length === 1 
+                                ? result.empresas[0]
+                                : `${result.empresas.length} empresas disponíveis`
+                              }
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="no-results">
+                          <div className="no-results-icon">🔍</div>
+                          <div className="no-results-title">Destino não encontrado na busca rápida?</div>
+                          <div className="no-results-text">
+                            Pergunte à atendente, temos mais de 5.000 destinos no sistema principal!
+                          </div>
+                          <button className="ask-attendant-btn">
+                            Falar com Atendente
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="success-screen active">
+                <div className="success-icon">✓</div>
+                <div className="success-title">SIM!</div>
+                <div className="success-destination">{selectedDestination.destino}</div>
+                <div className="success-company">
+                  {selectedDestination.empresas.length === 1 
+                    ? `Empresa: ${selectedDestination.empresas[0]}`
+                    : `Empresas: ${selectedDestination.empresas.join(', ')}`
+                  }
+                </div>
+
+                <div className="next-step-card">
+                  <div className="next-step-title">Próximo Passo: Pegue seu Ticket</div>
+                  <div className="ticket-icon">🎫</div>
+                  <div className="next-step-text">
+                    Dirija-se ao balcão, pegue seu ticket de papel, preencha seus dados e pague em dinheiro ou cartão diretamente com a atendente.
+                  </div>
+                </div>
+
+                <button className="back-btn" onClick={handleBack}>
+                  ← Buscar Outro Destino
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="footer-banner">
+            <span className="footer-icon">💳</span>
+            Não precisa de cartão de crédito. Pague no balcão.
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
